@@ -22,8 +22,7 @@ class Ball{
     setRaius(radius){
         this.radius = radius;
     }
-    render(canvas){
-        var ctx = canvas.getContext("2d");
+    render(ctx){        
         ctx.fillStyle = "rgb(0, 100, 0)";
         ctx.fillRect(this.positionX, this.positionY, this.radius, this.radius);
     }
@@ -35,27 +34,53 @@ class Renderer{
     }
     render(objects){
         for (let i = 0; i < objects.length; i++){
-            objects[i].render(this.canvas);
+            objects[i].render(this.ctx);
         }
     }
     refreshScreen(){
         this.ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 }
-window.addEventListener("load", ()=>{    
-    var resources = [new Ball(400, 300, 10)];
-    var renderer = new Renderer();
-    function loop() {
-        renderer.refreshScreen();//clear screen       
-        step(resources);//step in simulation        
-        renderer.render(resources); //render results of step
-        setTimeout(loop,16);//request next step in 1000ms    
+class Runner{        
+    constructor(renderer, resources){
+        this.renderer = renderer;        
+        this.resources = resources;        
+        this.timer = null;
     }
-    loop();
-});
-
-function step(objetos){    
-    objetos[0].setX(objetos[0].getX() + 2);
-    objetos[0].setY(objetos[0].getY() + 1);
+    loop = ()=>{
+        console.log(this.getContext);        
+        this.renderer.refreshScreen();//clear screen       
+        this.step(this.resources);//step in simulation        
+        this.renderer.render(this.resources); //render results of step
+        this.timer = setTimeout(this.loop,16);
+    }
+    step(objects){    
+        objects[0].setX(objects[0].getX() + 2);
+        objects[0].setY(objects[0].getY() + 1);
+        objects[1].setX(objects[1].getX() + 3);
+        objects[1].setY(objects[1].getY() + 2);
+    }
+    stop(){
+        clearTimeout(this.timer);
+        this.timer = null;
+    }
+    start(){
+        this.loop();
+    }
 }
+window.addEventListener("load", ()=>{    
+    var resources = [new Ball(400, 300, 10),new Ball(200, 200, 10)];
+    var renderer = new Renderer();    
+    var runner = new Runner(renderer, resources);
+    runner.start();
+    // setTimeout(runner.stop(), 10000);
+    // function loop() {
+    //     renderer.refreshScreen();//clear screen       
+    //     step(resources);//step in simulation        
+    //     renderer.render(resources); //render results of step
+    //     setTimeout(loop,16);//request next step in 1000ms    
+    // }
+    // loop();
+
+});
 
