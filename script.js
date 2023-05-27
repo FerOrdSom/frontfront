@@ -47,8 +47,7 @@ class Runner{
         this.resources = resources;        
         this.timer = null;
     }
-    loop = ()=>{
-        console.log(this.getContext);        
+    loop = ()=>{                
         this.renderer.refreshScreen();//clear screen       
         this.step(this.resources);//step in simulation        
         this.renderer.render(this.resources); //render results of step
@@ -68,19 +67,27 @@ class Runner{
         this.loop();
     }
 }
-window.addEventListener("load", ()=>{    
+
+window.addEventListener("load", ()=>{ 
+    let clicks = 0;
+    let button = document.getElementById("start-stop-btn");
+    button.addEventListener("click", ()=>{
+        if(clicks % 2 == 0){
+            button.innerHTML = "STOP";
+            runner.start();
+            clicks++;
+        }else{
+            button.innerHTML = "START";
+            runner.stop();
+            clicks++;
+        }
+    })   
     var resources = [new Ball(400, 300, 10),new Ball(200, 200, 10)];
     var renderer = new Renderer();    
     var runner = new Runner(renderer, resources);
-    runner.start();
-    // setTimeout(runner.stop(), 10000);
-    // function loop() {
-    //     renderer.refreshScreen();//clear screen       
-    //     step(resources);//step in simulation        
-    //     renderer.render(resources); //render results of step
-    //     setTimeout(loop,16);//request next step in 1000ms    
-    // }
-    // loop();
+    // runner.start();
+    
 
+       
 });
 
