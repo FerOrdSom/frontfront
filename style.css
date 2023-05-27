@@ -1,0 +1,7 @@
+html {
+    background-color: antiquewhite;
+}
+canvas {
+    border: 4px ridge rgb(255, 140, 0);
+    background-color: black;    
+}
