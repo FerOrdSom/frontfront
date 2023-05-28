@@ -59,11 +59,11 @@ class Runner{
         objects[1].setX(objects[1].getX() + 3);
         objects[1].setY(objects[1].getY() + 2);
     }
-    stop(){
+    stop = ()=>{
         clearTimeout(this.timer);
         this.timer = null;
     }
-    start(){
+    start = ()=>{
         this.loop();
     }
 }
@@ -85,9 +85,6 @@ window.addEventListener("load", ()=>{
     var resources = [new Ball(400, 300, 10),new Ball(200, 200, 10)];
     var renderer = new Renderer();    
     var runner = new Runner(renderer, resources);
-    // runner.start();
-    
-
-       
+    // runner.start();       
 });
 
