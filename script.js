@@ -72,16 +72,12 @@ class Runner{
         this.timer = null;
     }
     loop = ()=>{                
-        this.renderer.refreshScreen();//clear screen       
-        step(this.resources, this.renderer);//step in simulation        
-        this.renderer.render(this.resources); //render results of step
+        this.renderer.refreshScreen();       
+        step(this.resources, this.renderer);        
+        this.renderer.render(this.resources);
         this.timer = setTimeout(this.loop,16);
     }
-    // step(objects){    
-    //     objects[0].setX(objects[0].getX() + 2);
-    //     objects[0].setY(objects[0].getY() + 1);
-        
-    // }
+    
     stop = ()=>{
         clearTimeout(this.timer);
         this.timer = null;
@@ -105,40 +101,30 @@ window.addEventListener("load", ()=>{
             clicks++;
         }
     })   
-    var resources = [new Ball(300, 300, 6, 4, 10),new Ball(300, 200, -6, 4, 10),new Ball(100, 300, -6, -4, 10),new Ball(200, 250, 5, -5, 10)];
+    var resources = [new Ball(300, 300, 6, 4, 10),new Ball(300, 200, -7, 5, 10),new Ball(100, 300, -8, -9, 10),new Ball(200, 250, 9, -3, 10)];
     var renderer = new Renderer();    
-    var runner = new Runner(renderer, resources);
-    // runner.start();       
+    var runner = new Runner(renderer, resources);           
 });
-/*********************************************************************************************/
+
 function step(objects, renderer){
-     
-    //simple movement
     for (let i in objects){
         let newPosition = objects[i].getPosition();
         if(collisionNextStep(objects[i], renderer)){
-            newPosition = resolveCollision(objects[i], renderer);
-            console.log(`NewPosition in step: ${newPosition}`);
+            newPosition = resolveCollision(objects[i], renderer);            
             objects[i].setPosition(newPosition);  
         }else{
             newPosition = calculateNewPosition(objects[i].getPosition(), objects[i].getVelocity());
             objects[i].setPosition(newPosition);
-        }
-        
+        }        
     }
-
 }
+
 function calculateNewPosition(pos, velocity){
     return [(pos[0] + velocity[0]), (pos[1] + velocity[1])];
-    // console.group([(pos[0] + velocity[0]), (pos[1] + velocity[1])]);
+    
 }
 
-function collisionNextStep(object, renderer){
-    
-    //if posx + velx < left border(0) => true
-    //if posy + vely < top border(0) => true
-    //if posx + radius > right border => true
-    //if posy + radius > bottom border => true
+function collisionNextStep(object, renderer){    
     let position = object.getPosition();
     let velocity = object.getVelocity();
     let radius = object.getRadius();
@@ -151,19 +137,14 @@ function collisionNextStep(object, renderer){
         return true;
     }else{
         return false;
-    }
-    
+    }    
 }
-//resolveCollision => returns new future position. Calls collisionNextStep for further collissions and calls itsef again
-//calculates 'mini-steps'
-function resolveCollision(object, renderer){
-    //
+
+function resolveCollision(object, renderer){    
     let radius = object.getRadius();
-    let position = object.getPosition();
-    console.log(`Position: ${position}`);
+    let position = object.getPosition();    
     let velocity = object.getVelocity();
-    let virtualNextPosition = calculateNewPosition(position, velocity);
-    console.log(`VirtualNextPosition: ${virtualNextPosition}`);
+    let virtualNextPosition = calculateNewPosition(position, velocity);    
     let newPosition = virtualNextPosition;    
     let top = 0;
     let left = 0;
