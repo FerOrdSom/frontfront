@@ -1,30 +1,54 @@
 class Ball{
-    constructor(x, y, radius){
-        this.positionX = x;
-        this.positionY = y;
+    constructor(x, y, vx, vy,  radius){
+        this.position = [x, y];
+        this.velocity = [vx, vy];
         this.radius = radius;
     }
     getX(){
-        return this.positionX;
+        return this.position[0];
     }
     getY(){
-        return this.positionY;        
+        return this.position[1];        
+    }
+    getPosition(){
+        return this.position;
     }
     getRadius(){
         return this.radius;
     }
+    getVelocityX(){
+        return this.velocity[0];
+    }
+    getVelocityY(){
+        return this.velocity[1];
+    }
+    getVelocity(){
+        return this.velocity;
+    }
     setX(x){
-        this.positionX = x;
+        this.position[0] = x;
     }
     setY(y){
-        this.positionY = y;
+        this.position[1] = y;
     }
-    setRaius(radius){
+    setPosition(position){
+        this.position = position;
+    }
+    setVelocityX(vx){
+        this.velocity[0] = vx;
+    }
+    setVelocityY(vy){
+        this.velocity[1] = vy;
+    }
+    setVelocity(velocity){
+        this.velocity = velocity;
+    }
+    setRadius(radius){
         this.radius = radius;
     }
     render(ctx){        
         ctx.fillStyle = "rgb(0, 100, 0)";
-        ctx.fillRect(this.positionX, this.positionY, this.radius, this.radius);
+        ctx.fillRect(this.getX(), this.getY(), this.getRadius(), this.getRadius());
     }
 }
 class Renderer{
@@ -49,16 +73,15 @@ class Runner{
     }
     loop = ()=>{                
         this.renderer.refreshScreen();//clear screen       
-        this.step(this.resources);//step in simulation        
+        step(this.resources, this.renderer);//step in simulation        
         this.renderer.render(this.resources); //render results of step
         this.timer = setTimeout(this.loop,16);
     }
-    step(objects){    
-        objects[0].setX(objects[0].getX() + 2);
-        objects[0].setY(objects[0].getY() + 1);
-        objects[1].setX(objects[1].getX() + 3);
-        objects[1].setY(objects[1].getY() + 2);
-    }
+    // step(objects){    
+    //     objects[0].setX(objects[0].getX() + 2);
+    //     objects[0].setY(objects[0].getY() + 1);
+        
+    // }
     stop = ()=>{
         clearTimeout(this.timer);
         this.timer = null;
@@ -82,9 +105,105 @@ window.addEventListener("load", ()=>{
             clicks++;
         }
     })   
-    var resources = [new Ball(400, 300, 10),new Ball(200, 200, 10)];
+    var resources = [new Ball(300, 300, 6, 4, 10),new Ball(300, 200, -6, 4, 10),new Ball(100, 300, -6, -4, 10),new Ball(200, 250, 5, -5, 10)];
     var renderer = new Renderer();    
     var runner = new Runner(renderer, resources);
     // runner.start();       
 });
+/*********************************************************************************************/
+function step(objects, renderer){
+     
+    //simple movement
+    for (let i in objects){
+        let newPosition = objects[i].getPosition();
+        if(collisionNextStep(objects[i], renderer)){
+            newPosition = resolveCollision(objects[i], renderer);
+            console.log(`NewPosition in step: ${newPosition}`);
+            objects[i].setPosition(newPosition);  
+        }else{
+            newPosition = calculateNewPosition(objects[i].getPosition(), objects[i].getVelocity());
+            objects[i].setPosition(newPosition);
+        }
+        
+    }
 
+}
+function calculateNewPosition(pos, velocity){
+    return [(pos[0] + velocity[0]), (pos[1] + velocity[1])];
+    // console.group([(pos[0] + velocity[0]), (pos[1] + velocity[1])]);
+}
+
+function collisionNextStep(object, renderer){
+    
+    //if posx + velx < left border(0) => true
+    //if posy + vely < top border(0) => true
+    //if posx + radius > right border => true
+    //if posy + radius > bottom border => true
+    let position = object.getPosition();
+    let velocity = object.getVelocity();
+    let radius = object.getRadius();
+    let width = renderer.canvas.width;
+    let height = renderer.canvas.height;
+
+    if(position[0] + velocity[0] <= 0 || position[1] + velocity[1] <= 0 ||
+        position[0] + radius + velocity[0]>= width || position[1] + radius + velocity[1] >= height){
+        console.log("new Collision in next step!!!");    
+        return true;
+    }else{
+        return false;
+    }
+    
+}
+//resolveCollision => returns new future position. Calls collisionNextStep for further collissions and calls itsef again
+//calculates 'mini-steps'
+function resolveCollision(object, renderer){
+    //
+    let radius = object.getRadius();
+    let position = object.getPosition();
+    console.log(`Position: ${position}`);
+    let velocity = object.getVelocity();
+    let virtualNextPosition = calculateNewPosition(position, velocity);
+    console.log(`VirtualNextPosition: ${virtualNextPosition}`);
+    let newPosition = virtualNextPosition;    
+    let top = 0;
+    let left = 0;
+    let bottom = renderer.canvas.height;
+    let right = renderer.canvas.width;
+    
+    if(virtualNextPosition[0] + radius >= right){        
+        console.log("in condition 1");
+        if(virtualNextPosition[0] + radius == right){        
+            console.log("in condition 1.2");                        
+            newPosition[0] = virtualNextPosition[0];                
+            object.setVelocityX(-velocity[0]);
+        }else{
+            newPosition[0] = position[0] - (2 * (right - radius - position[0]) - velocity[0]);                
+            object.setVelocityX(-velocity[0]);
+        }
+    }
+    
+    if(virtualNextPosition[1] + radius > bottom){
+        console.log("in condition 2");
+        if(virtualNextPosition[1] + radius == bottom){
+            console.log("in condition 2.1");        
+            newPosition[1] = virtualNextPosition[1];
+            object.setVelocityY(-velocity[1]);
+        }else{
+            newPosition[1] = position[1] + (2 * (bottom - radius - position[1]) - velocity[1]);
+            object.setVelocityY(-velocity[1]);
+        }
+    }
+    
+    if(virtualNextPosition[0] <= left){
+        console.log("in condition 3");
+        newPosition[0] = -virtualNextPosition[0];
+        object.setVelocityX(-velocity[0]);
+    }
+    
+    if(virtualNextPosition[1] <= top){
+        console.log("in condition 4");
+        newPosition[1] = -virtualNextPosition[1];
+        object.setVelocityY(-velocity[1]);
+    }    
+    return newPosition;
+}
