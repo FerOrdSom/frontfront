@@ -75,7 +75,7 @@ class Runner{
         this.renderer.refreshScreen();       
         step(this.resources, this.renderer);        
         this.renderer.render(this.resources);
-        this.timer = setTimeout(this.loop,16);
+        this.timer = setTimeout(this.loop,0);
     }
     
     stop = ()=>{
@@ -101,7 +101,8 @@ window.addEventListener("load", ()=>{
             clicks++;
         }
     })   
-    var resources = [new Ball(300, 300, 6, 4, 10),new Ball(300, 200, -7, 5, 10),new Ball(100, 300, -8, -9, 10),new Ball(200, 250, 9, -3, 10)];
+    var resources = [new Ball(300, 300, 3, 2, 10),new Ball(300, 200, -3.5, 2.5, 10),new Ball(100, 300, -4, -4.5, 10),new Ball(200, 250, 4.5, -1.5, 10),
+                    new Ball(200, 350, 2.5, -2, 10),new Ball(300, 100, -4.5, -2.5, 10),new Ball(150, 250, -3, 4.5, 10),new Ball(100, 150, 2, -2, 10)];
     var renderer = new Renderer();    
     var runner = new Runner(renderer, resources);           
 });
@@ -120,7 +121,7 @@ function step(objects, renderer){
 }
 
 function calculateNewPosition(pos, velocity){
-    return [(pos[0] + velocity[0]), (pos[1] + velocity[1])];
+    return [pos[0] + velocity[0], pos[1] + velocity[1]];
     
 }
 
@@ -154,8 +155,7 @@ function resolveCollision(object, renderer){
     if(virtualNextPosition[0] + radius >= right){        
         console.log("in condition 1");
         if(virtualNextPosition[0] + radius == right){        
-            console.log("in condition 1.2");                        
-            newPosition[0] = virtualNextPosition[0];                
+            console.log("in condition 1.2");
             object.setVelocityX(-velocity[0]);
         }else{
             newPosition[0] = position[0] - (2 * (right - radius - position[0]) - velocity[0]);                
@@ -163,11 +163,10 @@ function resolveCollision(object, renderer){
         }
     }
     
-    if(virtualNextPosition[1] + radius > bottom){
+    if(virtualNextPosition[1] + radius >= bottom){
         console.log("in condition 2");
         if(virtualNextPosition[1] + radius == bottom){
-            console.log("in condition 2.1");        
-            newPosition[1] = virtualNextPosition[1];
+            console.log("in condition 2.1");
             object.setVelocityY(-velocity[1]);
         }else{
             newPosition[1] = position[1] + (2 * (bottom - radius - position[1]) - velocity[1]);
