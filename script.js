@@ -66,8 +66,8 @@ class Renderer{
     }
 }
 class Runner{        
-    constructor(renderer, resources){
-        this.renderer = renderer;        
+    constructor(resources){
+        this.renderer = new Renderer();        
         this.resources = resources;        
         this.timer = null;
     }
@@ -102,12 +102,11 @@ window.addEventListener("load", ()=>{
         }
     })   
     var resources = [new Ball(300, 300, 3, 2, 10),new Ball(300, 200, -3.5, 2.5, 10),new Ball(100, 300, -4, -4.5, 10),new Ball(200, 250, 4.5, -1.5, 10),
-                    new Ball(200, 350, 2.5, -2, 10),new Ball(300, 100, -4.5, -2.5, 10),new Ball(150, 250, -3, 4.5, 10),new Ball(100, 150, 2, -2, 10)];
-    var renderer = new Renderer();    
-    var runner = new Runner(renderer, resources);           
+                    new Ball(200, 350, 2.5, -2, 10),new Ball(300, 100, -4.5, -2.5, 10),new Ball(150, 250, -3, 4.5, 10),new Ball(100, 150, 2, -2, 10)];       
+    var runner = new Runner(resources);           
 });
 
-function step(objects, renderer){
+function step(objects, renderer){   //renderer should not be here on refactor
     for (let i in objects){
         let newPosition = objects[i].getPosition();
         if(collisionNextStep(objects[i], renderer)){
@@ -125,7 +124,7 @@ function calculateNewPosition(pos, velocity){
     
 }
 
-function collisionNextStep(object, renderer){    
+function collisionNextStep(object, renderer){  //think of a more general solution. renderer should not be here after refactor. (try collision between objects)   
     let position = object.getPosition();
     let velocity = object.getVelocity();
     let radius = object.getRadius();
@@ -141,7 +140,7 @@ function collisionNextStep(object, renderer){
     }    
 }
 
-function resolveCollision(object, renderer){    
+function resolveCollision(object, renderer){    //think of a more general solution. renderer should not be here after refactor. (try collision between objects)
     let radius = object.getRadius();
     let position = object.getPosition();    
     let velocity = object.getVelocity();
@@ -186,4 +185,8 @@ function resolveCollision(object, renderer){
         object.setVelocityY(-velocity[1]);
     }    
     return newPosition;
+}
+
+class Simulation{
+    //refactor: step and physics here
 }
