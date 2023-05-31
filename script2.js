@@ -56,8 +56,14 @@ class Renderer{
     }
     render(objects){        
         objects.forEach(object => {
-            this.ctx.fillStyle = "rgb(0, 100, 0)";
-            this.ctx.fillRect(object.getX(), object.getY(), object.getRadius(), object.getRadius());            
+            if(object.shape == "ball"){
+                this.ctx.fillStyle = "rgb(0, 100, 0)";
+                // this.ctx.fillRect(object.getX(), object.getY(), object.getRadius(), object.getRadius());
+                this.ctx.beginPath();
+                this.ctx.arc(object.getX(), object.getY(), object.getRadius(), 0, 2 * Math.PI);
+                this.ctx.fill();
+            }
+                        
         });
     }
     refreshScreen(){
@@ -116,7 +122,7 @@ class Simulation{
         let velocity = object.getVelocity();
         let radius = object.getRadius();        
     
-        if(position[0] + velocity[0] <= 0 || position[1] + velocity[1] <= 0 ||
+        if(position[0] - radius + velocity[0] <= 0 || position[1] - radius + velocity[1] <= 0 ||
             position[0] + radius + velocity[0]>= width || position[1] + radius + velocity[1] >= height){
             console.log("new Collision in next step!!!");    
             return true;
@@ -129,7 +135,8 @@ class Simulation{
         let radius = object.getRadius();
         let position = object.getPosition();    
         let velocity = object.getVelocity();
-        let virtualNextPosition = this.calculateNewPosition(position, velocity);    
+        let virtualNextPosition = this.calculateNewPosition(position, velocity); 
+        console.log(virtualNextPosition);   
         let newPosition = virtualNextPosition;    
         let top = 0; //try collision between objects
         let left = 0; //try collision between objects      
@@ -154,15 +161,26 @@ class Simulation{
                 object.setVelocityY(-velocity[1]);
             }
         }        
-        if(virtualNextPosition[0] <= left){
+        if(virtualNextPosition[0] - radius <= left){
             console.log("in condition 3");
-            newPosition[0] = -virtualNextPosition[0];
-            object.setVelocityX(-velocity[0]);
-        }        
-        if(virtualNextPosition[1] <= top){
+            if(virtualNextPosition[0] - radius == left){
+                console.log("in condition 3.1");
+                object.setVelocityX(-velocity[0]);
+            }else{
+                newPosition[0] = position[0] + (2 * (left + radius - position[0]) - velocity[0]);
+                object.setVelocityX(-velocity[0]);
+            }            
+        } 
+                         
+        if(virtualNextPosition[1] - radius <= top){
             console.log("in condition 4");
-            newPosition[1] = -virtualNextPosition[1];
-            object.setVelocityY(-velocity[1]);
+            if(virtualNextPosition[1] - radius == top){
+                console.log("in condition 4.1");
+                object.setVelocityY(-velocity[1]);
+            }else{
+                newPosition[1] = position[1] + (2 * (top + radius - position[1]) - velocity[1]);
+                object.setVelocityY(-velocity[1]);
+            }            
         }    
         return newPosition;
     }
@@ -182,6 +200,6 @@ window.addEventListener("load", ()=>{
             clicks++;
         }
     })
-    var objects = [new Ball(200, 200, 5, 7, 10)];    
+    var objects = [new Ball(200, 200, 8, -6, 5)];    
     var runner = new Runner(objects);           
 });
