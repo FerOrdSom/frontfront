@@ -54,14 +54,11 @@ class Renderer{
         this.canvas = document.getElementById("canvas");
         this.ctx = canvas.getContext("2d");        
     }
-    render(objects){
-        for (let i = 0; i < objects.length; i++){
-            if(objects[i].shape === "ball"){
-                this.ctx.fillStyle = "rgb(0, 100, 0)";
-                this.ctx.fillRect(objects[i].getX(), objects[i].getY(), objects[i].getRadius(), objects[i].getRadius());
-            }
-            
-        }
+    render(objects){        
+        objects.forEach(object => {
+            this.ctx.fillStyle = "rgb(0, 100, 0)";
+            this.ctx.fillRect(object.getX(), object.getY(), object.getRadius(), object.getRadius());            
+        });
     }
     refreshScreen(){
         this.ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -91,23 +88,23 @@ class Runner{
     }
 }
 class Simulation{    
-    constructor(resources, renderer){
-        this.objects = resources;
+    constructor(objects, renderer){
+        this.objects = objects;
         this.renderer = renderer;
         this.width = this.renderer.canvas.width;        
         this.height = this.renderer.canvas.height;
     }
-    step = ()=>{        
-        for (let i in this.objects){
-            let newPosition = this.objects[i].getPosition();            
-            if(this.collisionNextStep(this.objects[i], this.width, this.height)){
-                newPosition = this.resolveCollision(this.objects[i], this.width, this.height);            
-                this.objects[i].setPosition(newPosition);  
+    step = ()=>{
+        this.objects.forEach(object => {
+            let newPosition = object.getPosition();
+            if(this.collisionNextStep(object, this.width, this.height)){
+                newPosition = this.resolveCollision(object, this.width, this.height);            
+                object.setPosition(newPosition);  
             }else{
-                newPosition = this.calculateNewPosition(this.objects[i].getPosition(), this.objects[i].getVelocity());
-                this.objects[i].setPosition(newPosition);
-            }        
-        }
+                newPosition = this.calculateNewPosition(object.getPosition(), object.getVelocity());
+                object.setPosition(newPosition);
+            }
+        });
     }
     
     calculateNewPosition(pos, velocity){
@@ -146,8 +143,7 @@ class Simulation{
                 newPosition[0] = position[0] - (2 * (width - radius - position[0]) - velocity[0]);                
                 object.setVelocityX(-velocity[0]);
             }
-        }
-        
+        }        
         if(virtualNextPosition[1] + radius >= height){
             console.log("in condition 2");
             if(virtualNextPosition[1] + radius == height){
@@ -157,14 +153,12 @@ class Simulation{
                 newPosition[1] = position[1] + (2 * (height - radius - position[1]) - velocity[1]);
                 object.setVelocityY(-velocity[1]);
             }
-        }
-        
+        }        
         if(virtualNextPosition[0] <= left){
             console.log("in condition 3");
             newPosition[0] = -virtualNextPosition[0];
             object.setVelocityX(-velocity[0]);
-        }
-        
+        }        
         if(virtualNextPosition[1] <= top){
             console.log("in condition 4");
             newPosition[1] = -virtualNextPosition[1];
