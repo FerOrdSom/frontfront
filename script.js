@@ -75,7 +75,7 @@ class Runner{
         this.renderer.refreshScreen();       
         step(this.resources, this.renderer);        
         this.renderer.render(this.resources);
-        this.timer = setTimeout(this.loop,0);
+        this.timer = setTimeout(this.loop,16);
     }
     
     stop = ()=>{
@@ -101,8 +101,8 @@ window.addEventListener("load", ()=>{
             clicks++;
         }
     })   
-    var resources = [new Ball(300, 300, 3, 2, 10),new Ball(300, 200, -3.5, 2.5, 10),new Ball(100, 300, -4, -4.5, 10),new Ball(200, 250, 4.5, -1.5, 10),
-                    new Ball(200, 350, 2.5, -2, 10),new Ball(300, 100, -4.5, -2.5, 10),new Ball(150, 250, -3, 4.5, 10),new Ball(100, 150, 2, -2, 10)];       
+    // var resources = [new Ball(200, 200, 802, 802, 10)];  //buggy behaviour: maybe I have to resolve collisions recursively and in order? 
+    var resources = [new Ball(200, 200, 5, 7, 10)];    
     var runner = new Runner(resources);           
 });
 
@@ -128,8 +128,8 @@ function collisionNextStep(object, renderer){  //think of a more general solutio
     let position = object.getPosition();
     let velocity = object.getVelocity();
     let radius = object.getRadius();
-    let width = renderer.canvas.width;
-    let height = renderer.canvas.height;
+    let width = renderer.canvas.width; //Should be another object property
+    let height = renderer.canvas.height; //Should be another object property
 
     if(position[0] + velocity[0] <= 0 || position[1] + velocity[1] <= 0 ||
         position[0] + radius + velocity[0]>= width || position[1] + radius + velocity[1] >= height){
@@ -148,8 +148,8 @@ function resolveCollision(object, renderer){    //think of a more general soluti
     let newPosition = virtualNextPosition;    
     let top = 0;
     let left = 0;
-    let bottom = renderer.canvas.height;
-    let right = renderer.canvas.width;
+    let bottom = renderer.canvas.height;//Should be another object property
+    let right = renderer.canvas.width;//Should be another object property
     
     if(virtualNextPosition[0] + radius >= right){        
         console.log("in condition 1");
