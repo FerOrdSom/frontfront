@@ -3,13 +3,14 @@ class Ball{
         this.position = [x, y];
         this.velocity = [vx, vy];
         this.radius = radius;
+        this.shape = "ball";
     }
     getX(){
         return this.position[0];
     }
     getY(){
-        return this.position[1];        
-    }
+        return this.position[1];
+    }    
     getPosition(){
         return this.position;
     }
@@ -46,10 +47,7 @@ class Ball{
     setRadius(radius){
         this.radius = radius;
     }
-    render(ctx){        
-        ctx.fillStyle = "rgb(0, 100, 0)";
-        ctx.fillRect(this.getX(), this.getY(), this.getRadius(), this.getRadius());
-    }
+    
 }
 class Renderer{
     constructor(){
@@ -58,7 +56,11 @@ class Renderer{
     }
     render(objects){
         for (let i = 0; i < objects.length; i++){
-            objects[i].render(this.ctx);
+            if(objects[i].shape === "ball"){
+                this.ctx.fillStyle = "rgb(0, 100, 0)";
+                this.ctx.fillRect(objects[i].getX(), objects[i].getY(), objects[i].getRadius(), objects[i].getRadius());
+            }
+            
         }
     }
     refreshScreen(){
@@ -66,18 +68,18 @@ class Renderer{
     }
 }
 class Runner{        
-    constructor(resources){
-        this.resources = resources;
+    constructor(objects){
+        this.objects = objects;
         this.renderer = new Renderer();
-        this.simulation = new Simulation(this.resources, this.renderer);        
-                
+        this.simulation = new Simulation(this.objects, this.renderer);
         this.timer = null;
     }
-    loop = ()=>{                
+
+    loop = ()=>{//try loop that manages real time and simulation time
         this.renderer.refreshScreen();       
-        this.simulation.step(this.resources, this.renderer);      
-        this.renderer.render(this.resources);
-        this.timer = setTimeout(this.loop,16);
+        this.simulation.step(this.objects, this.renderer);      
+        this.renderer.render(this.objects);
+        this.timer = setTimeout(this.loop,16);//this time (ms) is hardcoded
     }
     
     stop = ()=>{
@@ -186,6 +188,6 @@ window.addEventListener("load", ()=>{
             clicks++;
         }
     })
-    var resources = [new Ball(200, 200, 5, 7, 10)];    
-    var runner = new Runner(resources);           
+    var objects = [new Ball(200, 200, 5, 7, 10)];    
+    var runner = new Runner(objects);           
 });
