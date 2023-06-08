@@ -175,10 +175,10 @@ class Simulation{
                     })
                 }               
                 // this.gravity(object);
-                let newPosition = object.getPosition();
-                console.log(object.getVelocityY());
-                newPosition = this.calculateNewPosition(object.getPosition(), object.getVelocity());                
+                
+                let newPosition = this.calculateNewPosition(object.getPosition(), object.getVelocity());                
                 object.setPosition(newPosition);
+                
                 
             }
         });
