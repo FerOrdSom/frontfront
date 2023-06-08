@@ -10,28 +10,28 @@ class Ball{
         let leftPoint = this.position.x - this.radius;
         let bottomPoint = this.position.y + this.radius;
         let upPoint = this.position.y - this.radius;
-        let result = {"collision" : false, "objects" : []};        
+        let collision = {"occurs" : false, "objects" : []};        
         objects.forEach(object =>{
-            if(object !== this){
+            if(object !== this){ //can't collide with itself
                 if(object.type == "vertical" && this.velocity.x > 0 && rightPoint >= object.getPosition() && leftPoint < object.getPosition()){                    
-                    result.collision = true; //from left side of vertical wall
-                    result.objects.push(object);                    
+                    collision.occurs = true; //from left side of vertical wall
+                    collision.objects.push(object);                    
                 }
                 if(object.type == "vertical" && this.velocity.x < 0 && leftPoint <= object.getPosition() && rightPoint > object.getPosition()){                    
-                    result.collision = true; //from right side of vertical wall
-                    result.objects.push(object);                    
+                    collision.occurs = true; //from right side of vertical wall
+                    collision.objects.push(object);                    
                 }
                 if(object.type == "horizontal" && this.velocity.y > 0 && bottomPoint >= object.getPosition() && upPoint < object.getPosition()){                    
-                    result.collision = true; //from upper side of horizontal wall
-                    result.objects.push(object);                    
+                    collision.occurs = true; //from upper side of horizontal wall
+                    collision.objects.push(object);                    
                 }
                 if(object.type == "horizontal" && this.velocity.y < 0 && upPoint <= object.getPosition() && bottomPoint > object.getPosition()){                    
-                    result.collision = true; //from bottom side of horizontal wall
-                    result.objects.push(object);                    
+                    collision.occurs = true; //from bottom side of horizontal wall
+                    collision.objects.push(object);                    
                 }
             }        
         })        
-        return result;
+        return collision;
     }
     getX(){
         return this.position.x;
@@ -160,23 +160,26 @@ class Simulation{
     constructor(objects){
         this.objects = objects;
     }
-    // gravity = (object)=>{
-    //     let gravityAcceleration = 1; //per sim step ud/step^2
+    // gravity = (object)=>{ 
+    //     let gravityAcceleration = 1; //length ud/step^2
     //     object.setVelocityY(object.getVelocityY() + gravityAcceleration);
     // }
     step = () =>{
-        this.objects.forEach(object => {            
-            if(object.type === "ball"){                
-                let collision = object.isColliding(this.objects);                
-                if(collision.collision){
+        this.objects.forEach(object => {//Refactor: if objects[] is redesigned this could be cleaner => {"balls" : [...], "walls" : [...]}            
+            if(object.type === "ball"){ //this check could be unnecessary, one tier less
+                              
+                let collision = object.isColliding(this.objects);//think of better name and rename inner structure too               
+                if(collision.occurs){
                     collision.objects.forEach(wall => {
                         this.collisionResolution(object, wall);
                     })
                 }               
                 // this.gravity(object);
                 let newPosition = object.getPosition();
-                newPosition = this.calculateNewPosition(object.getPosition(), object.getVelocity());
+                console.log(object.getVelocityY());
+                newPosition = this.calculateNewPosition(object.getPosition(), object.getVelocity());                
                 object.setPosition(newPosition);
+                
             }
         });
     }    
@@ -185,7 +188,7 @@ class Simulation{
         let newY = pos.y + velocity.y;
         return {"x" : newX, "y" : newY};        
     }
-    collisionResolution(object1, object2){
+    collisionResolution(object1, object2){ //use of normal vectors should simplify this 
         if(object2.type == "horizontal"){
             object1.velocity.y = -object1.velocity.y;
         }
@@ -209,6 +212,6 @@ window.addEventListener("load", ()=>{
         }
     });
     var objects = [new Ball(200, 200, 7, 5, 5), new Wall("horizontal", 400), new Wall("vertical", 400),
-                    new Wall("horizontal", 0), new Wall("vertical", 0)];      
+                    new Wall("horizontal", 0), new Wall("vertical", 0)];
     var runner = new Runner(objects);           
 });
