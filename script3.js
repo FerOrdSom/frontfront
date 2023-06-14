@@ -49,8 +49,8 @@ class Ball{
     }    
 }
 class Wall{
-    // at the moment, walls are only horizontal or vertical inifinite lines.
-    constructor (type = "vertical", position = 0){
+    // at the moment, walls are only horizontal or vertical inifinite lines for the simulation system.
+    constructor (type, position){
         this.position = position;        
         this.type = type;
     }

@@ -159,27 +159,18 @@ class Runner{
 class Simulation{    
     constructor(objects){
         this.objects = objects;
-    }
-    // gravity = (object)=>{ 
-    //     let gravityAcceleration = 1; //length ud/step^2
-    //     object.setVelocityY(object.getVelocityY() + gravityAcceleration);
-    // }
+    }    
     step = () =>{
         this.objects.forEach(object => {//Refactor: if objects[] is redesigned this could be cleaner => {"balls" : [...], "walls" : [...]}            
-            if(object.type === "ball"){ //this check could be unnecessary, one tier less
-                              
+            if(object.type === "ball"){ //this check could be unnecessary, one tier less                              
                 let collision = object.isColliding(this.objects);//think of better name and rename inner structure too               
                 if(collision.occurs){
                     collision.objects.forEach(wall => {
                         this.collisionResolution(object, wall);
                     })
-                }               
-                // this.gravity(object);
-                
+                }              
                 let newPosition = this.calculateNewPosition(object.getPosition(), object.getVelocity());                
                 object.setPosition(newPosition);
-                
-                
             }
         });
     }    
