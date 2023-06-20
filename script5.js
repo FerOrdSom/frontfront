@@ -4,36 +4,28 @@ class Ball{
         this.velocity = {"x" : vx, "y" : vy};
         this.radius = radius;
         this.type = "ball";
-    }
-    // v.5 this method should be simpler, only checks if the object is colliding with another
+    }    
     // v.5 all the collision cases of this particular object should be described here Ball*Ball Ball*Wall Ball*Object...
-    isColliding(objects){//v.5 <- So this now recieves only one object and returns true/false
+    isColliding(object){
         let rightPoint = this.position.x + this.radius; 
         let leftPoint = this.position.x - this.radius;
         let bottomPoint = this.position.y + this.radius;
         let upPoint = this.position.y - this.radius;
-        let collision = {"occurs" : false, "objects" : []};//v.5 objects now are handled by Simulation.detectCollisions()        
-        objects.forEach(object =>{//v.5 not neccessary now, only a pair is compared
-            if(object !== this){ //can't collide with itself
-                if(object.type == "vertical" && this.velocity.x > 0 && rightPoint >= object.getPosition() && leftPoint < object.getPosition()){                    
-                    collision.occurs = true; //from left side of vertical wall
-                    collision.objects.push(object);                    
-                }
-                if(object.type == "vertical" && this.velocity.x < 0 && leftPoint <= object.getPosition() && rightPoint > object.getPosition()){                    
-                    collision.occurs = true; //from right side of vertical wall
-                    collision.objects.push(object);                    
-                }
-                if(object.type == "horizontal" && this.velocity.y > 0 && bottomPoint >= object.getPosition() && upPoint < object.getPosition()){                    
-                    collision.occurs = true; //from upper side of horizontal wall
-                    collision.objects.push(object);                    
-                }
-                if(object.type == "horizontal" && this.velocity.y < 0 && upPoint <= object.getPosition() && bottomPoint > object.getPosition()){                    
-                    collision.occurs = true; //from bottom side of horizontal wall
-                    collision.objects.push(object);                    
-                }
-                //v.5 add ball detection too
-            }        
-        })        
+        let collision = false;
+        
+        if (object.type == "vertical" && this.velocity.x > 0 && rightPoint >= object.getPosition() && leftPoint < object.getPosition()) {
+            collision = true; //from left side of vertical wall            
+        }
+        if (object.type == "vertical" && this.velocity.x < 0 && leftPoint <= object.getPosition() && rightPoint > object.getPosition()) {
+            collision = true; //from right side of vertical wall            
+        }
+        if (object.type == "horizontal" && this.velocity.y > 0 && bottomPoint >= object.getPosition() && upPoint < object.getPosition()) {
+            collision = true; //from upper side of horizontal wall            
+        }
+        if (object.type == "horizontal" && this.velocity.y < 0 && upPoint <= object.getPosition() && bottomPoint > object.getPosition()) {
+            collision = true; //from bottom side of horizontal wall            
+        }
+        //let's try Ball*Ball       
         return collision;
     }
     getX(){
@@ -97,10 +89,28 @@ class Wall{
     setType(type){
         this.type = type;
     }
-    // v.5 walls collide too... Wall*Ball = Ball*Wall when we want to detect a collision
     isColliding(object){
-        //v.5 *Ball
-        //v.5 *Wall
+        let collision = false;
+        if(object.type === "ball"){
+            let rightPoint = object.position.x + object.radius; 
+            let leftPoint = object.position.x - object.radius;
+            let bottomPoint = object.position.y + object.radius;
+            let upPoint = object.position.y - object.radius;
+
+            if (this.type == "vertical" && object.velocity.x > 0 && rightPoint >= this.getPosition() && leftPoint < this.getPosition()) {
+                collision = true; //from left side of vertical wall            
+            }
+            if (this.type == "vertical" && object.velocity.x < 0 && leftPoint <= this.getPosition() && rightPoint > this.getPosition()) {
+                collision = true; //from right side of vertical wall            
+            }
+            if (this.type == "horizontal" && object.velocity.y > 0 && bottomPoint >= this.getPosition() && upPoint < this.getPosition()) {
+                collision = true; //from upper side of horizontal wall            
+            }
+            if (this.type == "horizontal" && object.velocity.y < 0 && upPoint <= this.getPosition() && bottomPoint > this.getPosition()) {
+                collision = true; //from bottom side of horizontal wall            
+            }
+        }
+        return collision;
     }
 }
 class Renderer{
@@ -178,81 +188,64 @@ class Simulation{
     //     object.setVelocityY(object.getVelocityY() + gravityAcceleration);
     // }
     step = () =>{
-        // v.4:
-        // this.objects.forEach(object => {            
-        //     if(object.type === "ball"){
-                              
-        //         let collision = object.isColliding(this.objects);               
-        //         if(collision.occurs){
-        //             collision.objects.forEach(wall => {
-        //                 this.collisionResolution(object, wall);
-        //             })
-        //         }               
-        //         // this.gravity(object); // v.5 not now
-                
-        //         let newPosition = this.calculateNewPosition(object.getPosition(), object.getVelocity());                
-        //         object.setPosition(newPosition);
-                
-                
-        //     }
-        // });
-
-        // v.5 proposed new Simulation.step() form:
-        // create listOfCollisions decide wich data structure works best for this particular case. this variable makes sense in the scope
-        // of Simulation.step() and only there.
-        // checkForCollisions(); || listOfCollisions = checkForCollisions(); //adds to de list (reference should be passed or this creates the list)
-        // if(listOfCollisions != NULL)
-        // resolveCollisions(listOfCollisions); //reads the list (reference should be passed)
-        // calculateWorldPositions(); // v.5 calculatePosition applied to every object
-    }    
+        let listOfCollisions = this.checkForCollisions(this.objects);
+        if (listOfCollisions.length > 0){
+            this.resolveCollisions(listOfCollisions);
+        }
+        this.calculateWorldPositions(this.objects);
+    }
+    resolveCollisions(collisions){
+        collisions.forEach(collisionPair => {
+            this.collisionResolution(collisionPair[0], collisionPair[1]);
+        })
+    }
+    collisionResolution(firstObject, secondObject){
+        if(firstObject.type === "ball"){
+            if(secondObject.type === "horizontal"){
+                firstObject.velocity.y = -firstObject.velocity.y;
+            }
+            if(secondObject.type === "vertical"){
+                firstObject.velocity.x = -firstObject.velocity.x;
+            }
+        }
+        if(secondObject.type === "ball"){
+            if(firstObject.type === "horizontal"){
+                secondObject.velocity.y = -secondObject.velocity.y;
+            }
+            if(firstObject.type === "vertical"){
+                secondObject.velocity.x = -secondObject.velocity.x;
+            }
+        }
+    }
+    checkForCollisions(objects){ 
+        let listOfCollisions = [];
+        for(let i = 0; i < objects.length; i++){
+            for(let j = i + 1; j < objects.length; j++){
+                if(objects[i].isColliding(objects[j])){                    
+                    listOfCollisions.push([objects[i], objects[j]]);
+                }
+            }
+        }
+        return listOfCollisions; 
+    }
+    calculateWorldPositions(objects){        
+        console.log(`Objects: ${objects}`);
+        console.log(objects);
+        objects.forEach(object =>{            
+            if(object.type === "ball"){ // this check exists because walls don't have any velocity
+                let newPosition = this.calculateNewPosition(object.position, object.velocity);
+                object.setPosition(newPosition);
+            }
+        });
+    }
     calculateNewPosition(pos, velocity){
         let newX = pos.x + velocity.x;
         let newY = pos.y + velocity.y;
         return {"x" : newX, "y" : newY};        
     }
-    // v.5 this method modifies the state of the objects in a collision pair
-    collisionResolution(object1, object2){
-        // v.5 here I'll write what happens when: Ball*Ball, Ball*Wall, and in the future Object*Ball, Object*Wall
-        // v.5 After that I'll simplify if some of them are not necessary or if I should make it simple  
-        // v.4:
-        // if(object2.type == "horizontal"){
-        //     object1.velocity.y = -object1.velocity.y;
-        // }
-        // if(object2.type == "vertical"){
-        //     object1.velocity.x = -object1.velocity.x;
-        // }
-    }
-    // v.5 Generates a collection of collisions in this particular step that sould be resolved
-    checkForCollisions(){ // <- the empty list is given to modify or maybe this method is used to initialize it.
-
-        for(let i = 0; i < this.objects.length; i++){
-            for(let j = i + 1; j < this.objects.length; j++){
-                if(this.objects[i].isColliding()){
-                    //v.5 add object[i] and object[j] to the list to resolve their collision
-                }
-            }
-        }
-        // return the list? 
-
-    }
-    // v.5 takes the collection of collision pairs in one step and calculates the result of each collision case
-    resolveCollisions(collisions){//<- recieved list of collision pairs 
-        // !!pseudo code:
-        // collisions.forEach(collisionPair =>{
-        //    collisionResolution(collisionPair.firstObject, collisionPair.secondObject);
-        //})
-    }
-
-    // v.5 new method added for readability purposes
-    calculateWorldPositions(){
-        // !!pseudo code:        
-        // objects.forEach(object =>{
-        //    let position = object.position;
-        //    let newPosition = calculateNewPosition(object.position , object.velocity);
-        //    object.setPosition(newPosition);
-        //})
-    }
 }
+
+//Initialization
 window.addEventListener("load", ()=>{ 
     let clicks = 0;
     let button = document.getElementById("start-stop-btn");
@@ -267,7 +260,7 @@ window.addEventListener("load", ()=>{
             clicks++;
         }
     });
-    var objects = [new Ball(200, 200, -9, 9, 5), new Wall("horizontal", 400), new Wall("vertical", 400),
+    var objects = [new Wall("horizontal", 400), new Ball(200, 200, -9, 9, 5),  new Wall("vertical", 400),
                     new Wall("horizontal", 0), new Wall("vertical", 0)];
     var runner = new Runner(objects);           
 });
