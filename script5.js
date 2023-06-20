@@ -172,7 +172,9 @@ class Runner{
     }
     reset = ()=>{
         this.objects = [new Wall("horizontal", 400), new Ball(200, 200, -9, 9, 5),  new Wall("vertical", 400),
-        new Wall("horizontal", 0), new Wall("vertical", 0)]; 
+        new Wall("horizontal", 0), new Wall("vertical", 0)];
+        this.renderer.refreshScreen();
+        this.renderer.render(this.objects); 
     }
 }
 class Simulation{    
