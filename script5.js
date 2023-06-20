@@ -4,14 +4,14 @@ class Ball{
         this.velocity = {"x" : vx, "y" : vy};
         this.radius = radius;
         this.type = "ball";
-    }    
-    // v.5 all the collision cases of this particular object should be described here Ball*Ball Ball*Wall Ball*Object...
+    }
     isColliding(object){
         let rightPoint = this.position.x + this.radius; 
         let leftPoint = this.position.x - this.radius;
         let bottomPoint = this.position.y + this.radius;
         let upPoint = this.position.y - this.radius;
-        let collision = false;        
+        let collision = false;
+        //TO DO: Make this thing prittier        
         if (object.type == "vertical" && this.velocity.x > 0 && rightPoint >= object.getPosition() && leftPoint < object.getPosition()) {
             collision = true; //from left side of vertical wall            
         }
@@ -95,7 +95,7 @@ class Wall{
             let leftPoint = object.position.x - object.radius;
             let bottomPoint = object.position.y + object.radius;
             let upPoint = object.position.y - object.radius;
-
+            //TO DO: make this thing prittier
             if (this.type == "vertical" && object.velocity.x > 0 && rightPoint >= this.getPosition() && leftPoint < this.getPosition()) {
                 collision = true; //from left side of vertical wall            
             }
@@ -127,7 +127,6 @@ class Renderer{
                 this.ctx.fill();
             }
             if(object.type == "horizontal"){
-                //draw horizontal line
                 let y = object.getPosition();                
                 this.ctx.lineWidth = 4;
                 this.ctx.strokeStyle = "rgb(200, 200, 200)";                
@@ -137,7 +136,6 @@ class Renderer{
                 this.ctx.stroke();
             }
             if(object.type == "vertical"){
-                //draw vertical line
                 let x = object.getPosition();
                 this.ctx.lineWidth = 4;
                 this.ctx.strokeStyle = "rgb(200, 200, 200)";                
@@ -152,7 +150,7 @@ class Renderer{
         this.ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 }
-class Runner{ // v.5 litte side-quest: add a reset functionality       
+class Runner{       
     constructor(objects){        
         this.objects = objects;        
         this.renderer = new Renderer();
@@ -172,10 +170,9 @@ class Runner{ // v.5 litte side-quest: add a reset functionality
     start = ()=>{
         this.loop();
     }
-    // v.5 my little side-quest
     reset = ()=>{
         this.objects = [new Wall("horizontal", 400), new Ball(200, 200, -9, 9, 5),  new Wall("vertical", 400),
-        new Wall("horizontal", 0), new Wall("vertical", 0)];//new state to runner, not possible to clone at the beginning, object methods get lost           
+        new Wall("horizontal", 0), new Wall("vertical", 0)]; 
     }
 }
 class Simulation{    
@@ -259,10 +256,8 @@ window.addEventListener("load", ()=>{
     });
     resetBtn.addEventListener("click", ()=>{
         runner.reset();  
-    })  
-    
+    })
     var objects = [new Wall("horizontal", 400), new Ball(200, 200, -9, 9, 5),  new Wall("vertical", 400),
                     new Wall("horizontal", 0), new Wall("vertical", 0)];    
-    var runner = new Runner(objects); 
-            
+    var runner = new Runner(objects);
 });
