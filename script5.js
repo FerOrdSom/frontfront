@@ -11,8 +11,7 @@ class Ball{
         let leftPoint = this.position.x - this.radius;
         let bottomPoint = this.position.y + this.radius;
         let upPoint = this.position.y - this.radius;
-        let collision = false;
-        
+        let collision = false;        
         if (object.type == "vertical" && this.velocity.x > 0 && rightPoint >= object.getPosition() && leftPoint < object.getPosition()) {
             collision = true; //from left side of vertical wall            
         }
@@ -154,15 +153,15 @@ class Renderer{
     }
 }
 class Runner{ // v.5 litte side-quest: add a reset functionality       
-    constructor(objects){
-        this.objects = objects;                      
+    constructor(objects){        
+        this.objects = objects;        
         this.renderer = new Renderer();
-        this.simulation = new Simulation(this.objects);
+        this.simulation = new Simulation(this.objects);        
         this.timer = null;
     }
     loop = ()=>{//try loop that manages real time and simulation time
         this.renderer.refreshScreen();       
-        this.simulation.step();      
+        this.simulation.step(this.objects);      
         this.renderer.render(this.objects);
         this.timer = setTimeout(this.loop,16);//this time (ms) is hardcoded
     }    
@@ -175,24 +174,24 @@ class Runner{ // v.5 litte side-quest: add a reset functionality
     }
     // v.5 my little side-quest
     reset = ()=>{
-        // set initial condition
+        // this.objects = null;
+        this.objects = [new Wall("horizontal", 400), new Ball(200, 200, -9, 9, 5),  new Wall("vertical", 400),
+        new Wall("horizontal", 0), new Wall("vertical", 0)];//new state to runner, not possible to clone at the beginning, object methods get lost           
     }
 }
 class Simulation{    
-    constructor(objects){
-        this.objects = objects;
-    }
+    constructor(){}
     // v.5 NOT IMPORTANT NOW !!bug: when about to stop on the ground, it ends up clipping because of the constantly increasing velocity
     // gravity = (object)=>{ 
     //     let gravityAcceleration = 1; //length ud/step^2
     //     object.setVelocityY(object.getVelocityY() + gravityAcceleration);
     // }
-    step = () =>{
-        let listOfCollisions = this.checkForCollisions(this.objects);
+    step = (objects) =>{
+        let listOfCollisions = this.checkForCollisions(objects);
         if (listOfCollisions.length > 0){
             this.resolveCollisions(listOfCollisions);
         }
-        this.calculateWorldPositions(this.objects);
+        this.calculateWorldPositions(objects);
     }
     resolveCollisions(collisions){
         collisions.forEach(collisionPair => {
@@ -217,7 +216,7 @@ class Simulation{
             }
         }
     }
-    checkForCollisions(objects){ 
+    checkForCollisions(objects){
         let listOfCollisions = [];
         for(let i = 0; i < objects.length; i++){
             for(let j = i + 1; j < objects.length; j++){
@@ -228,12 +227,10 @@ class Simulation{
         }
         return listOfCollisions; 
     }
-    calculateWorldPositions(objects){        
-        console.log(`Objects: ${objects}`);
-        console.log(objects);
+    calculateWorldPositions(objects){
         objects.forEach(object =>{            
             if(object.type === "ball"){ // this check exists because walls don't have any velocity
-                let newPosition = this.calculateNewPosition(object.position, object.velocity);
+                let newPosition = this.calculateNewPosition(object.position, object.velocity);//so this fails
                 object.setPosition(newPosition);
             }
         });
@@ -249,6 +246,7 @@ class Simulation{
 window.addEventListener("load", ()=>{ 
     let clicks = 0;
     let button = document.getElementById("start-stop-btn");
+    let resetBtn = document.getElementById("reset-btn");
     button.addEventListener("click", ()=>{
         if(clicks % 2 == 0){
             button.innerHTML = "STOP";
@@ -260,7 +258,17 @@ window.addEventListener("load", ()=>{
             clicks++;
         }
     });
+    resetBtn.addEventListener("click", ()=>{
+        console.log("Reset!!!");
+        // objects[1].setPosition({"x" : 200,"y": 200});
+        // objects[1].setVelocity({"x" : -9,"y": 9});
+
+        // console.log(objects); 
+        runner.reset();  
+    })  
+    
     var objects = [new Wall("horizontal", 400), new Ball(200, 200, -9, 9, 5),  new Wall("vertical", 400),
-                    new Wall("horizontal", 0), new Wall("vertical", 0)];
-    var runner = new Runner(objects);           
+                    new Wall("horizontal", 0), new Wall("vertical", 0)];    
+    var runner = new Runner(objects); 
+            
 });
