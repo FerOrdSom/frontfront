@@ -156,7 +156,7 @@ class Runner{ // v.5 litte side-quest: add a reset functionality
     constructor(objects){        
         this.objects = objects;        
         this.renderer = new Renderer();
-        this.simulation = new Simulation(this.objects);        
+        this.simulation = new Simulation();        
         this.timer = null;
     }
     loop = ()=>{//try loop that manages real time and simulation time
@@ -174,7 +174,6 @@ class Runner{ // v.5 litte side-quest: add a reset functionality
     }
     // v.5 my little side-quest
     reset = ()=>{
-        // this.objects = null;
         this.objects = [new Wall("horizontal", 400), new Ball(200, 200, -9, 9, 5),  new Wall("vertical", 400),
         new Wall("horizontal", 0), new Wall("vertical", 0)];//new state to runner, not possible to clone at the beginning, object methods get lost           
     }
@@ -259,11 +258,6 @@ window.addEventListener("load", ()=>{
         }
     });
     resetBtn.addEventListener("click", ()=>{
-        console.log("Reset!!!");
-        // objects[1].setPosition({"x" : 200,"y": 200});
-        // objects[1].setVelocity({"x" : -9,"y": 9});
-
-        // console.log(objects); 
         runner.reset();  
     })  
     
