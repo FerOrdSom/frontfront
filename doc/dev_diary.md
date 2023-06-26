@@ -53,7 +53,7 @@ So any browser shouls be able to run the game, wich is convenient.
 
 ## 2023-06-20: Collisions continued.
 - Added new 'reset' functionality and button.
-- Collision process:
+- Collision process have to be redone and reevaluated, but this current version will be the new starting point:
     - Even more simple methods involved.
     - Refactor. Each object class now has a method to check if an instance of itself is colliding.
     - check for collitions(between all objects) -> all detected pair of collitions go to a list.
