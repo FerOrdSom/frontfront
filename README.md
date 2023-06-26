@@ -18,6 +18,6 @@ So any browser shouls be able to run the game, wich is convenient.
 - Canvas will be the rendering method.
 - Firefox will be the browser used in development.
 
-[Game loop](../doc/gameloop.md)
+[Game loop](https://github.com/FerOrdSom/frontfront/tree/main/doc/gameloop.md)
 
 
