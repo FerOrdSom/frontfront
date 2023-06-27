@@ -1,3 +1,16 @@
+class Score{
+    constructor(){
+        this.score = 0;
+        this.type = "score";
+    }
+    isColliding(object){
+        return false;
+    }
+    AddScore(points){
+        this.score = this.score + points;
+    }
+}
+
 class Ball{
     constructor(x, y, vx, vy,  radius){
         this.position = {"x" : x, "y" : y};
@@ -72,7 +85,7 @@ class Ball{
 }
 class Wall{
     // at the moment, walls are only horizontal or vertical inifinite lines for the simulation system.
-    constructor (type, position){
+    constructor (type, position){        
         this.position = position;        
         this.type = type;
     }
@@ -128,22 +141,28 @@ class Renderer{
             }
             if(object.type == "horizontal"){
                 let y = object.getPosition();                
-                this.ctx.lineWidth = 4;
+                this.ctx.lineWidth = 8;
                 this.ctx.strokeStyle = "rgb(200, 200, 200)";                
                 this.ctx.beginPath();
-                this.ctx.moveTo(0, y);
-                this.ctx.lineTo(this.canvas.width, y);
+                this.ctx.moveTo(20 - 4, y);
+                this.ctx.lineTo(this.canvas.width - 16, y);
                 this.ctx.stroke();
             }
             if(object.type == "vertical"){
                 let x = object.getPosition();
-                this.ctx.lineWidth = 4;
+                this.ctx.lineWidth = 8;
                 this.ctx.strokeStyle = "rgb(200, 200, 200)";                
                 this.ctx.beginPath();
-                this.ctx.moveTo(x, 0);
-                this.ctx.lineTo(x, this.canvas.height);
+                this.ctx.moveTo(x, 40);
+                this.ctx.lineTo(x, this.canvas.height - 20);
                 this.ctx.stroke();
-            }                        
+            }
+            if(object.type == "score"){
+                let text = `SCORE: ${object.score}`;
+                this.ctx.font = "20px Arial";
+                this.ctx.fillStyle = "white";
+                this.ctx.fillText(text, 16, 25);
+            }                       
         });
     }
     refreshScreen(){
@@ -171,7 +190,7 @@ class Runner{
         this.loop();
     }
     reset = ()=>{
-        this.objects = [new Wall("horizontal", 400), new Ball(200, 200, -9, 9, 5),  new Wall("vertical", 400),
+        this.objects = [new Score(), new Wall("horizontal", 400), new Ball(200, 200, -9, 9, 5),  new Wall("vertical", 400),
         new Wall("horizontal", 0), new Wall("vertical", 0)];
         this.renderer.refreshScreen();
         this.renderer.render(this.objects); 
@@ -187,9 +206,15 @@ class Simulation{
     step = (objects) =>{
         let listOfCollisions = this.checkForCollisions(objects);
         if (listOfCollisions.length > 0){
+            this.refreshScore(objects, listOfCollisions.length);
             this.resolveCollisions(listOfCollisions);
         }
         this.calculateWorldPositions(objects);
+    }
+    refreshScore(objects, scoreToAdd){{
+        objects[0].AddScore(scoreToAdd);//score has is always first until world state is properly defined
+    }
+
     }
     resolveCollisions(collisions){
         collisions.forEach(collisionPair => {
@@ -259,7 +284,7 @@ window.addEventListener("load", ()=>{
     resetBtn.addEventListener("click", ()=>{
         runner.reset();  
     })
-    var objects = [new Wall("horizontal", 400), new Ball(200, 200, -9, 9, 5),  new Wall("vertical", 400),
-                    new Wall("horizontal", 0), new Wall("vertical", 0)];    
+    var objects = [new Score(), new Wall("horizontal", 380), new Ball(200, 200, -5, 5, 5),  new Wall("vertical", 380),
+                    new Wall("horizontal", 40), new Wall("vertical", 20)];    
     var runner = new Runner(objects);
 });

@@ -20,6 +20,7 @@ In order to achieve this basic game, some requirements are needed:
 - Simulate: Calculates next state of the game. Includes movement and collisions of objects.
 - Render: Gives the ability to draw things on a screen.
 
+
  
 
 

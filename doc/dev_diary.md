@@ -62,6 +62,10 @@ So any browser shouls be able to run the game, wich is convenient.
 ## 2023-06-26: Documentation work
 - Project rearrangement for discipline and future analysis on development process.
 
+## 2023-06-27: Redesigning wall objects rendering and game screen
+- For proper visualization on the canvas.
+- Adding a score to the screen.
+
 
 
 
