@@ -141,16 +141,16 @@ class Renderer{
             }
             if(object.type == "horizontal"){
                 let y = object.getPosition();                
-                this.ctx.lineWidth = 8;
+                this.ctx.lineWidth = 6;
                 this.ctx.strokeStyle = "rgb(200, 200, 200)";                
                 this.ctx.beginPath();
-                this.ctx.moveTo(20 - 4, y);
-                this.ctx.lineTo(this.canvas.width - 16, y);
+                this.ctx.moveTo(20 - 3, y);
+                this.ctx.lineTo(this.canvas.width - 17, y);
                 this.ctx.stroke();
             }
             if(object.type == "vertical"){
                 let x = object.getPosition();
-                this.ctx.lineWidth = 8;
+                this.ctx.lineWidth = 6;
                 this.ctx.strokeStyle = "rgb(200, 200, 200)";                
                 this.ctx.beginPath();
                 this.ctx.moveTo(x, 40);
@@ -159,7 +159,7 @@ class Renderer{
             }
             if(object.type == "score"){
                 let text = `SCORE: ${object.score}`;
-                this.ctx.font = "20px Arial";
+                this.ctx.font = "20px Stencil Std";
                 this.ctx.fillStyle = "white";
                 this.ctx.fillText(text, 16, 25);
             }                       
