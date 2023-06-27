@@ -65,6 +65,7 @@ So any browser shouls be able to run the game, wich is convenient.
 ## 2023-06-27: Redesigning wall objects rendering and game screen
 - For proper visualization on the canvas.
 - Adding a score to the screen.
+- Some minor content adjustments and CSS changes.
 
 
 

@@ -190,8 +190,8 @@ class Runner{
         this.loop();
     }
     reset = ()=>{
-        this.objects = [new Score(), new Wall("horizontal", 400), new Ball(200, 200, -9, 9, 5),  new Wall("vertical", 400),
-        new Wall("horizontal", 0), new Wall("vertical", 0)];
+        this.objects = [new Score(), new Wall("horizontal", 380), new Ball(200, 200, -5, 5, 5),  new Wall("vertical", 380),
+        new Wall("horizontal", 40), new Wall("vertical", 20)];
         this.renderer.refreshScreen();
         this.renderer.render(this.objects); 
     }
